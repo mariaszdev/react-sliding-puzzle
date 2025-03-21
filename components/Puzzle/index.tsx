@@ -10,11 +10,11 @@ export default function Puzzle({ size }: { size: number }) {
   const { width, height } = useWindowSize();
 
   const getBoardValues = () => Array.from(Array(size * size).keys());
-  const randomValues = () => getBoardValues().sort(() => Math.random() - 0.5);
   const buildPuzzleOutOfValues = (values: number[]) =>
     Array(size)
       .fill(0)
       .map((_, i) => values.slice(i * size, (i + 1) * size));
+  const getSolvedBoard = () => buildPuzzleOutOfValues(getBoardValues());
 
   const SOLVED_PUZZLE = getBoardValues();
 
@@ -22,12 +22,36 @@ export default function Puzzle({ size }: { size: number }) {
   const [emptySpace, setEmptySpace] = useState<{ x: number; y: number } | null>(null);
   const [hasWon, setHasWon] = useState(false);
 
+  const shuffleBoard = (moves: number = 3) => {
+    let board = getSolvedBoard();
+    let index = board.flat().indexOf(0);
+    let empty = { y: Math.floor(index / size), x: index % size };
+
+    const getNeighbors = ({ x, y }: { x: number; y: number }) =>
+      [
+        { x, y: y - 1 },
+        { x, y: y + 1 },
+        { x: x - 1, y },
+        { x: x + 1, y },
+      ].filter(({ x, y }) => x >= 0 && x < size && y >= 0 && y < size);
+
+    for (let i = 0; i < moves; i++) {
+      const neighbors = getNeighbors(empty);
+      const next = neighbors[Math.floor(Math.random() * neighbors.length)];
+
+      // Swap with empty space
+      board[empty.y][empty.x] = board[next.y][next.x];
+      board[next.y][next.x] = 0;
+      empty = next;
+    }
+
+    setBoard(board);
+    setEmptySpace(empty);
+    setHasWon(false);
+  };
+
   useEffect(() => {
-    const initialBoard = buildPuzzleOutOfValues(randomValues());
-    setBoard(initialBoard);
-    const index = initialBoard.flat().indexOf(0);
-    setEmptySpace({ y: Math.floor(index / size), x: index % size });
-    setHasWon(false); // reset win state on board init
+    shuffleBoard(100); // Number of shuffle moves = difficulty
   }, [size]);
 
   const isNeighbor = ({ x, y }: { x: number; y: number }) =>
@@ -46,7 +70,14 @@ export default function Puzzle({ size }: { size: number }) {
     setEmptySpace(position);
     setBoard(newBoard);
 
-    if (newBoard.flat().join("") === SOLVED_PUZZLE.join("")) {
+    const flat = newBoard.flat();
+    const emptyIndex = flat.indexOf(0);
+    
+    const validWin =
+      (emptyIndex === 0 || emptyIndex === flat.length - 1) &&
+      flat.filter(n => n !== 0).every((val, i) => val === i + 1);
+    
+    if (validWin) {
       setHasWon(true);
     }
   };
