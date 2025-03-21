@@ -1,0 +1,21 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 10px;
+  text-align: center;
+}
+
+.heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #4b2e14;
+  margin: 0;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #5a3e2b;
+  max-width: 700px;
+  line-height: 1.6;
+}
