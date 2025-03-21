@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 import Tile from "@/components/Tile";
-import styles from './styles.module.css';
+import styles from "./styles.module.css";
 
 export default function Puzzle({ size }: { size: number }) {
+  const { width, height } = useWindowSize();
 
   const getBoardValues = () => Array.from(Array(size * size).keys());
   const randomValues = () => getBoardValues().sort(() => Math.random() - 0.5);
@@ -17,12 +20,14 @@ export default function Puzzle({ size }: { size: number }) {
 
   const [board, setBoard] = useState<number[][]>([]);
   const [emptySpace, setEmptySpace] = useState<{ x: number; y: number } | null>(null);
+  const [hasWon, setHasWon] = useState(false);
 
   useEffect(() => {
     const initialBoard = buildPuzzleOutOfValues(randomValues());
     setBoard(initialBoard);
     const index = initialBoard.flat().indexOf(0);
     setEmptySpace({ y: Math.floor(index / size), x: index % size });
+    setHasWon(false); // reset win state on board init
   }, [size]);
 
   const isNeighbor = ({ x, y }: { x: number; y: number }) =>
@@ -42,12 +47,13 @@ export default function Puzzle({ size }: { size: number }) {
     setBoard(newBoard);
 
     if (newBoard.flat().join("") === SOLVED_PUZZLE.join("")) {
-      console.log("won");
+      setHasWon(true);
     }
   };
 
   return (
     <div className={styles.container}>
+      {hasWon && <Confetti width={width} height={height} />}
       {board.length > 0 ? (
         <div className={styles.box}>
           <div
@@ -64,7 +70,7 @@ export default function Puzzle({ size }: { size: number }) {
                 row.map((id, colIndex) => ({
                   id,
                   x: colIndex,
-                  y: rowIndex
+                  y: rowIndex,
                 }))
               )
               .sort((a, b) => a.y - b.y || a.x - b.x)
