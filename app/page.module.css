@@ -1,21 +1,28 @@
-.pageContainer {
+.container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 30px 10px;
   text-align: center;
+  padding: 20px 10px 0px 10px;
+  background-image: url("/bg/cardboard-light.jpg"); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100%;
 }
 
 .heading {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: bold;
-  color: #4b2e14;
-  margin: 0;
+  color: var(--color-main);
+  padding-bottom: 10px;
 }
 
 .description {
-  font-size: 1.1rem;
-  color: #5a3e2b;
+  font-size: 1rem;
+  color: var(--color-main);
   max-width: 700px;
   line-height: 1.6;
+  padding-bottom: 15px;
 }

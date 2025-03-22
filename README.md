@@ -1,7 +1,6 @@
 # React Sliding Puzzle 🧩
 
-A simple sliding puzzles with shuffled number tiles. 
-The goal is to rearrange the tiles in order from top-left to bottom-right.
+A classic sliding tile puzzle game built with React and Next.js. Shuffle the board and arrange the numbered tiles in ascending order to win.
  
 ## 🚀 Getting Started
 
@@ -34,9 +33,14 @@ Visit `http://localhost:3000` in your browser to play the puzzle!
 - [TypeScript](https://www.typescriptlang.org/)
 - [CSS Modules](https://github.com/css-modules/css-modules)
 
-## 📌 Todo (Planned Features)
+## ✅ Features
 
-- [ ] 🎉 win indicator e.g. confetti rain 
-- [ ] ▦ Selectable grid sizes (3x3, 4x4, 5x5, 6x6)
-- [ ] 🔄 Reshuffle button
-- [ ] ➡️ move tiles with arrow keys
+- 🎨 Smooth tile movement with animations
+- 🔀 Shuffle board with “Easy” or “Hard” options
+- ▦ Selectable grid sizes: 3x3, 4x4, 5x5, 6x6
+- ✅ Win feedback with animation and visual indicator
+- 🧠 Solvable shuffles to ensure winnable games
+
+## 📌 Planned Features
+
+- [ ] ➡️ Move tiles with arrow keys

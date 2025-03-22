@@ -1,30 +1,35 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Confetti from "react-confetti";
-import { useWindowSize } from "react-use";
-import Tile from "@/components/Tile";
+import React, { useEffect, useState, useCallback } from "react";
+import { motion } from "framer-motion";
+import Controls from "@/components/Controls";
+import Board from "@/components/Board";
+import WinIndicator from "@/components/WinIndicator";
 import styles from "./styles.module.css";
 
-export default function Puzzle({ size }: { size: number }) {
-  const { width, height } = useWindowSize();
-
-  const getBoardValues = () => Array.from(Array(size * size).keys());
-  const buildPuzzleOutOfValues = (values: number[]) =>
-    Array(size)
-      .fill(0)
-      .map((_, i) => values.slice(i * size, (i + 1) * size));
-  const getSolvedBoard = () => buildPuzzleOutOfValues(getBoardValues());
-
-  const SOLVED_PUZZLE = getBoardValues();
-
+export default function Puzzle() {
+  const [size, setSize] = useState(4);
   const [board, setBoard] = useState<number[][]>([]);
   const [emptySpace, setEmptySpace] = useState<{ x: number; y: number } | null>(null);
   const [hasWon, setHasWon] = useState(false);
 
-  const shuffleBoard = (moves: number = 3) => {
-    let board = getSolvedBoard();
-    let index = board.flat().indexOf(0);
+  const getBoardValues = useCallback(() => {
+    return Array.from(Array(size * size).keys());
+  }, [size]);
+
+  const buildPuzzleOutOfValues = useCallback((values: number[]) => {
+    return Array(size)
+      .fill(0)
+      .map((_, i) => values.slice(i * size, (i + 1) * size));
+  }, [size]);
+
+  const getSolvedBoard = useCallback(() => {
+    return buildPuzzleOutOfValues(getBoardValues());
+  }, [buildPuzzleOutOfValues, getBoardValues]);
+
+  const shuffleBoard = (moves: number = size * size) => {
+    const board = getSolvedBoard();
+    const index = board.flat().indexOf(0);
     let empty = { y: Math.floor(index / size), x: index % size };
 
     const getNeighbors = ({ x, y }: { x: number; y: number }) =>
@@ -38,8 +43,6 @@ export default function Puzzle({ size }: { size: number }) {
     for (let i = 0; i < moves; i++) {
       const neighbors = getNeighbors(empty);
       const next = neighbors[Math.floor(Math.random() * neighbors.length)];
-
-      // Swap with empty space
       board[empty.y][empty.x] = board[next.y][next.x];
       board[next.y][next.x] = 0;
       empty = next;
@@ -51,8 +54,19 @@ export default function Puzzle({ size }: { size: number }) {
   };
 
   useEffect(() => {
-    shuffleBoard(100); // Number of shuffle moves = difficulty
-  }, [size]);
+    const solved = getSolvedBoard();
+    const flat = solved.flat();
+    const zeroIndex = flat.indexOf(0);
+    if (zeroIndex !== 0) {
+      const origX = zeroIndex % size;
+      const origY = Math.floor(zeroIndex / size);
+      solved[origY][origX] = solved[0][0];
+      solved[0][0] = 0;
+    }
+    setBoard(solved);
+    setEmptySpace({ x: 0, y: 0 });
+    setHasWon(false);
+  }, [getSolvedBoard, size]);
 
   const isNeighbor = ({ x, y }: { x: number; y: number }) =>
     emptySpace &&
@@ -72,56 +86,39 @@ export default function Puzzle({ size }: { size: number }) {
 
     const flat = newBoard.flat();
     const emptyIndex = flat.indexOf(0);
-    
+
     const validWin =
       (emptyIndex === 0 || emptyIndex === flat.length - 1) &&
       flat.filter(n => n !== 0).every((val, i) => val === i + 1);
-    
-    if (validWin) {
-      setHasWon(true);
-    }
+
+    setHasWon(validWin);
   };
 
   return (
     <div className={styles.container}>
-      {hasWon && <Confetti width={width} height={height} />}
-      {board.length > 0 ? (
-        <div className={styles.box}>
-          <div
-            className={styles.board}
-            style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${size}, 100px)`,
-              gridTemplateRows: `repeat(${size}, 100px)`,
-              gap: "4px",
-            }}
+      <Controls
+        size={size}
+        onSizeChange={setSize}
+        onShuffleEasy={() => shuffleBoard(size * size)}
+        onShuffleHard={() => shuffleBoard(size * size * 20)}
+      />
+
+      <div className={styles.boxContainer}>
+        <motion.div
+          className={styles.box}
+          layout
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+        >
+          <Board
+            board={board}
+            size={size}
+            emptySpace={emptySpace}
+            onSwitchTile={switchTile}
           >
-            {board
-              .flatMap((row, rowIndex) =>
-                row.map((id, colIndex) => ({
-                  id,
-                  x: colIndex,
-                  y: rowIndex,
-                }))
-              )
-              .sort((a, b) => a.y - b.y || a.x - b.x)
-              .map(({ id, x, y }) => (
-                <Tile
-                  key={id}
-                  id={id}
-                  x={x}
-                  y={y}
-                  emptySpace={emptySpace}
-                  onChange={switchTile}
-                />
-              ))}
-          </div>
-        </div>
-      ) : (
-        <div className={styles.loaderContainer}>
-          <div className={styles.loader}></div>
-        </div>
-      )}
+            <WinIndicator active={hasWon} />
+          </Board>
+        </motion.div>
+      </div>
     </div>
   );
 }

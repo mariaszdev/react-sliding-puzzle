@@ -1,0 +1,18 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-main: #412300;
+  --color-invert: #ffffff; 
+  --color-invert-hover: #f1dcbd; 
+  --font-family: 'Georgia', 'Times New Roman', Times, serif;
+}
+
+body {
+  font-family: var(--font-family);
+  color: var(--main-color);
+  background-color: #f7f0e9;
+}

@@ -1,0 +1,18 @@
+.checkmarkOverlay {
+  position: absolute;
+  inset: 0; /* Top, Right, Bottom, Left = 0 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.checkmarkOverlay :global(img) {
+  width: 140px;
+  height: 140px;
+  filter: 
+    drop-shadow(1px 1px 0.8px  rgba(0, 0, 0, 0.4))
+    drop-shadow(2px 2px 0.8px  rgba(0, 0, 0, 0.2));
+}
