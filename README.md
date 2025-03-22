@@ -2,7 +2,12 @@
 
 A classic sliding tile puzzle game built with React and Next.js. Shuffle the board and arrange the numbered tiles in ascending order to win.
  
-## 🚀 Getting Started
+## 🚀 Live Demo
+
+Launch the game: [Sliding Puzzle Game](https://react-sliding-puzzle-swart.vercel.app/)
+
+
+## 🛠️ Getting Started
 
 ### 1. Clone the repository
 
